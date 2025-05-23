@@ -1,0 +1,111 @@
+﻿@model Assignment2.MvcFx.Models.Order
+@{
+    Layout = null; // Explicitly state no layout page
+    ViewBag.Title = "Order Report - ID: " + Model.OrderID;
+    decimal orderTotal = 0; // Variable to calculate total
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .header-info p {
+            margin: 5px 0;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            border-top: 2px solid black;
+        }
+        /* Add print-specific styles if needed */
+        @@media print {
+            body {
+                font-size: 10pt;
+            }
+
+            .no-print {
+                display: none;
+            }
+            /* Class for buttons you don't want printed */
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Report</h1>
+
+    <div class="header-info">
+        <p><strong>Order ID:</strong> @Model.OrderID</p>
+        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+        <p><strong>Agent Name:</strong> @(Model.Agent?.AgentName ?? "N/A")</p>
+        <p><strong>Agent Address:</strong> @(Model.Agent?.Address ?? "N/A")</p>
+    </div>
+
+    <h3>Order Details</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Item ID</th>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th class="text-right">Unit Amount</th>
+                <th class="text-right">Line Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.OrderDetails != null)
+            {
+                foreach (var detail in Model.OrderDetails)
+                {
+                    decimal lineTotal = detail.Quantity * detail.UnitAmount;
+                    orderTotal += lineTotal; // Accumulate total
+                    <tr>
+                        <td>@detail.ItemID</td>
+                        <td>@(detail.Item?.ItemName ?? "N/A")</td>
+                        <td>@detail.Quantity</td>
+                        <td class="text-right">@detail.UnitAmount.ToString("C2")</td>
+                        <td class="text-right">@lineTotal.ToString("C2")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="4" class="text-right"><strong>Order Total:</strong></td>
+                <td class="text-right"><strong>@orderTotal.ToString("C2")</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <br />
+    <button onclick="window.print();" class="no-print">Print this page</button>
+    <a href="@Url.Action("Index", "Orders")" class="no-print">Back to Orders List</a>
+
+</body>
+</html>

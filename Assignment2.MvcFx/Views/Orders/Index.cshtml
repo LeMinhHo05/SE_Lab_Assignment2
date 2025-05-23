@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Assignment2.MvcFx.Models.Order>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.OrderDate)
+        </th>
+        <th>
+            Agent Name <%-- Display user-friendly header --%>
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.OrderDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Agent.AgentName) <%-- Access the Name via the navigation property --%>
+            <%-- Alternative if Agent might be null: @(item.Agent?.AgentName ?? "N/A") --%>
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.OrderID }) |
+            @Html.ActionLink("Details", "Details", new { id = item.OrderID }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.OrderID })
+            @Html.ActionLink("Print", "PrintOrder", new { id = item.OrderID }, new { target = "_blank" }) // Added target="_blank" to open in new tab
+        </td>
+    </tr>
+}
+
+</table>

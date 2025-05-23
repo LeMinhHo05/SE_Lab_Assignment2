@@ -1,0 +1,71 @@
+﻿@model Assignment2.MvcFx.Controllers.FilterViewModel
+@{
+    ViewBag.Title = "Filter Reports";
+}
+
+<h2>@ViewBag.Title</h2>
+
+@using (Html.BeginForm("GenerateReport", "Filter", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <fieldset>
+        <legend>Select Filter</legend>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FilterType, htmlAttributes: new { @class = "control-label" })
+            <div>
+                @Html.RadioButtonFor(model => model.FilterType, "BestSellers", new { id = "rbBestSellers", @checked = "checked" }) <!-- Default checked -->
+                @Html.Label("rbBestSellers", "Best Selling Items (Top 10)")
+                <br />
+                @Html.RadioButtonFor(model => model.FilterType, "AgentHistory", new { id = "rbAgentHistory" })
+                @Html.Label("rbAgentHistory", "Agent Order History")
+                @Html.ValidationMessageFor(model => model.FilterType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        
+        <div id="agentSelectorPanel" class="form-group" style="display: none;">
+            <%-- Initially hidden --%>
+            @Html.LabelFor(model => model.SelectedAgentId, htmlAttributes: new { @class = "control-label" })
+            <div>
+                @Html.DropDownListFor(model => model.SelectedAgentId, Model.AvailableAgents, "-- Select Agent --", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SelectedAgentId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+    </fieldset>
+    <br />
+    <div class="form-group">
+        <input type="submit" value="Generate Report" class="btn btn-primary" />
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Function to toggle agent selector visibility
+            function toggleAgentSelector() {
+                if ($('#rbAgentHistory').is(':checked')) {
+                    $('#agentSelectorPanel').show();
+                } else {
+                    $('#agentSelectorPanel').hide();
+                    // Optional: Clear agent dropdown selection when hidden
+                    // $('#SelectedAgentId').val('');
+                }
+            }
+
+            // Initial check on page load
+            toggleAgentSelector();
+
+            // Bind change event to radio buttons
+            $('input[type=radio][name=FilterType]').change(function () {
+                toggleAgentSelector();
+            });
+        });
+    </script>
+}
+}

@@ -1,0 +1,70 @@
+﻿@model Assignment2.CoreMvc.Models.FilterViewModel 
+@{
+    ViewData["Title"] = "Filter Reports";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-controller="Filter" asp-action="GenerateReport" method="post">
+    @Html.AntiForgeryToken() 
+
+    <fieldset class="border p-3 mb-3">
+        <legend class="w-auto px-2">Select Filter</legend>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div> <%-- For general errors --%>
+
+        <div class="mb-3">
+            <label class="form-label">Filter Type:</label>
+            <div>
+                <input type="radio" asp-for="FilterType" value="BestSellers" id="rbBestSellers" class="form-check-input" checked="checked" />
+                <label for="rbBestSellers" class="form-check-label">Best Selling Items (Top 10)</label>
+            </div>
+            <div>
+                <input type="radio" asp-for="FilterType" value="AgentHistory" id="rbAgentHistory" class="form-check-input" />
+                <label for="rbAgentHistory" class="form-check-label">Agent Order History</label>
+            </div>
+            <span asp-validation-for="FilterType" class="text-danger"></span>
+        </div>
+
+        
+        <div id="agentSelectorPanel" class="mb-3" style="display: none;">
+            
+            <label asp-for="SelectedAgentId" class="form-label"></label>
+            <select asp-for="SelectedAgentId" asp-items="Model.AvailableAgents" class="form-select">
+                <option value="">-- Select Agent --</option>
+            </select>
+            <span asp-validation-for="SelectedAgentId" class="text-danger"></span>
+        </div>
+
+    </fieldset>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function toggleAgentSelector() {
+                if ($('#rbAgentHistory').is(':checked')) {
+                    $('#agentSelectorPanel').show();
+                } else {
+                    $('#agentSelectorPanel').hide();
+                    $('#SelectedAgentId').val(''); // Clear selection when hiding
+                }
+            }
+
+            // Initial state
+            toggleAgentSelector();
+
+            // Bind change event
+            $('input[type=radio][name=FilterType]').change(function () {
+                toggleAgentSelector();
+            });
+        });
+    </script>
+}

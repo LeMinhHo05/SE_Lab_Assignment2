@@ -1,0 +1,122 @@
+﻿@model Assignment2.Core.Models.Order
+@{
+    Layout = null; // This view will not use the main site layout
+    ViewData["Title"] = "Order Report - ID: " + Model.OrderID;
+    decimal orderTotal = 0; // Variable to calculate order total
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .header-info p {
+            margin: 3px 0;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            border-top: 2px solid black;
+        }
+
+        .no-print {
+            margin-top: 30px;
+        }
+
+        @@media print {
+            body {
+                font-size: 10pt;
+                margin: 0.5in;
+            }
+            /* Adjust print margins */
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Report</h1>
+
+    <div class="header-info">
+        <p><strong>Order ID:</strong> @Model.OrderID</p>
+        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+        <p><strong>Agent Name:</strong> @(Model.Agent?.AgentName ?? "N/A")</p>
+        <p><strong>Agent Address:</strong> @(Model.Agent?.Address ?? "N/A")</p>
+    </div>
+
+    <h3>Order Details</h3>
+    @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Item Name</th>
+                    <th class="text-right">Quantity</th>
+                    <th class="text-right">Unit Amount</th>
+                    <th class="text-right">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.OrderDetails)
+                {
+                    decimal lineTotal = detail.Quantity * detail.UnitAmount;
+                    orderTotal += lineTotal;
+                    <tr>
+                        <td>@detail.ItemID</td>
+                        <td>@(detail.Item?.ItemName ?? "N/A")</td>
+                        <td class="text-right">@detail.Quantity</td>
+                        <td class="text-right">@detail.UnitAmount.ToString("C2")</td>
+                        <td class="text-right">@lineTotal.ToString("C2")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="4" class="text-right"><strong>Order Total:</strong></td>
+                    <td class="text-right"><strong>@orderTotal.ToString("C2")</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+    else
+    {
+        <p>No details found for this order.</p>
+    }
+
+    <div class="no-print">
+        <button onclick="window.print();" class="btn btn-primary">Print this page</button>
+        <a asp-controller="Orders" asp-action="Index" class="btn btn-secondary">Back to Orders List</a>
+    </div>
+</body>
+</html>
+
